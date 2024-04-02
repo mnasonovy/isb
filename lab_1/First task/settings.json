@@ -1,5 +1,6 @@
 {
-    "sourse_text":"story_of_Neo.txt",
+    "sourse_text":"First task/story_of_Neo.txt",
     "random_key":"First task/cipher_key.json",
+    "encrypted text":"First task/encrypted_text.txt",
     "shift":1
 }
