@@ -1,4 +1,6 @@
 import json
+import os
+
 
 def generate_cipher_key(shift, filename):
     # Генерация ключа шифрования для алфавита с учетом сдвига
@@ -13,7 +15,7 @@ def generate_cipher_key(shift, filename):
     # Возвращаем ключ
     return {'original_alphabet': alphabet, 'shifted_alphabet': shifted_alphabet}
 
-# Пример использования:
-shift = 3  # Пример сдвига на 3 символа
-cipher_key = generate_cipher_key(shift, 'cipher_key.json')
-print(cipher_key)
+with open(os.path.join('First task', 'settings.json'), 'r') as settings:
+        settings = json.load(settings)
+cipher_key = generate_cipher_key(settings['shift'], settings['random_key'])
+
