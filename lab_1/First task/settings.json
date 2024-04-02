@@ -1,8 +1,0 @@
-{
-    "alphabet":"абвгдежзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
-    "random_key":"First task/cipher_key.json",
-    "sourse_text":"First task/sourse_text.txt",
-    "encrypted text":"First task/encrypted_text.txt",
-    "mode":"encrypt",
-    "shift":1
-}
