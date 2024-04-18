@@ -1,4 +1,7 @@
 import math
+import json
+import os
+from typing import List  
 from scipy.special import gammainc
 
 def read_sequence_from_file(filename: str) -> str:
@@ -47,12 +50,13 @@ def same_bits_test(sequence: str) -> float:
     P = math.erfc(abs(Vn - 2 * N * sigma * (1 - sigma)) / (2 * math.sqrt(2 * N) * sigma * (1 - sigma)))
     return P
 
-def longest_ones_sequence_test(sequence: str) -> float:
+def longest_ones_sequence_test(sequence: str, consts_PI: List[float]) -> float:
     """
     Calculate the P value for the test of the longest sequence of ones in a block.
 
     Parameters:
         sequence (str): Sequence of bits.
+        consts_PI (List[float]): List of constants for the test.
 
     Returns:
         float: The P value.
@@ -77,8 +81,32 @@ def longest_ones_sequence_test(sequence: str) -> float:
             v[2] += 1
         else:
             v[3] += 1
-    consts_PI = [0.2148, 0.3672, 0.2305, 0.1875]  
     for i in range(len(v)):
         hi_2 += ((v[i] - 16 * consts_PI[i]) ** 2) / (16 * consts_PI[i])
     P = gammainc(3 / 2, hi_2 / 2)  
     return P
+
+def run_tests_and_write_results(input_filename: str, output_filename: str, settings: dict):
+    sequence = read_sequence_from_file(input_filename)
+    frequency_result = frequency_bitwise_test(sequence)
+    same_bits_result = same_bits_test(sequence)
+    longest_ones_result = longest_ones_sequence_test(sequence, settings['consts_PI'])
+
+    results = {
+        "Frequency Bitwise Test": frequency_result,
+        "Same Bits Test": same_bits_result,
+        "Longest Ones Sequence Test": longest_ones_result
+    }
+    write_results_to_file(output_filename, results)
+    
+def main():
+    with open(os.path.join('settings.json'), 'r', encoding='utf-8') as settings_file:
+        settings = json.load(settings_file)
+    input_filenames = [settings['cc_sequence_intput'], settings['java_sequence_intput']]
+    output_filenames = [settings['cc_sequence_output'], settings['java_sequence_output']]
+
+    for input_filename, output_filename in zip(input_filenames, output_filenames):
+        run_tests_and_write_results(input_filename, output_filename, settings)
+
+if __name__ == "__main__":
+    main()
