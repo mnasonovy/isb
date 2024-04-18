@@ -1,19 +1,38 @@
 import math
 import json
 import os
+
 from typing import List  
 from scipy.special import gammainc
 
-def read_sequence_from_file(filename: str) -> str:
 
+def read_sequence_from_file(filename: str) -> str:
+    """
+    Read a sequence of bytes from a file.
+
+    Parameters:
+        filename (str): The name of the file to read.
+
+    Returns:
+        str: The sequence of bytes read from the file.
+    """
     with open(filename, 'r') as file:
         sequence = file.read().strip()
     return sequence
 
+
 def write_results_to_file(filename: str, results: dict):
+    """
+    Write test results to a file.
+
+    Parameters:
+        filename (str): The name of the file to write to.
+        results (dict): A dictionary containing test names as keys and their corresponding results as values.
+    """
     with open(filename, 'w') as file:
         for test, result in results.items():
             file.write(f"{test}: {result}\n")
+            
             
 def frequency_bitwise_test(sequence: str) -> float:
     """
@@ -30,6 +49,7 @@ def frequency_bitwise_test(sequence: str) -> float:
     P = sum_bits / math.sqrt(N)
     P = math.erfc(P / math.sqrt(2))
     return P
+
 
 def same_bits_test(sequence: str) -> float:
     """
@@ -49,6 +69,7 @@ def same_bits_test(sequence: str) -> float:
     Vn = sum(1 for i in range(len(sequence) - 1) if sequence[i] != sequence[i + 1])
     P = math.erfc(abs(Vn - 2 * N * sigma * (1 - sigma)) / (2 * math.sqrt(2 * N) * sigma * (1 - sigma)))
     return P
+
 
 def longest_ones_sequence_test(sequence: str, consts_PI: List[float]) -> float:
     """
@@ -86,7 +107,16 @@ def longest_ones_sequence_test(sequence: str, consts_PI: List[float]) -> float:
     P = gammainc(3 / 2, hi_2 / 2)  
     return P
 
+
 def run_tests_and_write_results(input_filename: str, output_filename: str, settings: dict):
+    """
+    Run tests on a sequence and write the results to a file.
+
+    Parameters:
+        input_filename (str): The name of the file containing the input sequence.
+        output_filename (str): The name of the file to write the test results to.
+        settings (dict): A dictionary containing settings for the tests.
+    """
     sequence = read_sequence_from_file(input_filename)
     frequency_result = frequency_bitwise_test(sequence)
     same_bits_result = same_bits_test(sequence)
@@ -99,6 +129,7 @@ def run_tests_and_write_results(input_filename: str, output_filename: str, setti
     }
     write_results_to_file(output_filename, results)
     
+    
 def main():
     with open(os.path.join('settings.json'), 'r', encoding='utf-8') as settings_file:
         settings = json.load(settings_file)
@@ -107,6 +138,7 @@ def main():
 
     for input_filename, output_filename in zip(input_filenames, output_filenames):
         run_tests_and_write_results(input_filename, output_filename, settings)
+
 
 if __name__ == "__main__":
     main()
