@@ -1,4 +1,5 @@
 import math
+from scipy.special import gammainc
 
 def read_sequence_from_file(filename: str) -> str:
 
@@ -44,4 +45,40 @@ def same_bits_test(sequence: str) -> float:
         return 0 
     Vn = sum(1 for i in range(len(sequence) - 1) if sequence[i] != sequence[i + 1])
     P = math.erfc(abs(Vn - 2 * N * sigma * (1 - sigma)) / (2 * math.sqrt(2 * N) * sigma * (1 - sigma)))
+    return P
+
+def longest_ones_sequence_test(sequence: str) -> float:
+    """
+    Calculate the P value for the test of the longest sequence of ones in a block.
+
+    Parameters:
+        sequence (str): Sequence of bits.
+
+    Returns:
+        float: The P value.
+    """
+    block_length = 8
+    v = [0, 0, 0, 0]
+    hi_2 = 0
+    for block in range(0, len(sequence) // block_length):
+        max_len = 0
+        curr_len = 0
+        for i in range(block * block_length, block * block_length + block_length):
+            if sequence[i] == '1':
+                curr_len += 1
+                max_len = max(max_len, curr_len)
+            else:
+                curr_len = 0
+        if max_len <= 1:
+            v[0] += 1
+        elif max_len == 2:
+            v[1] += 1
+        elif max_len == 3:
+            v[2] += 1
+        else:
+            v[3] += 1
+    consts_PI = [0.2148, 0.3672, 0.2305, 0.1875]  
+    for i in range(len(v)):
+        hi_2 += ((v[i] - 16 * consts_PI[i]) ** 2) / (16 * consts_PI[i])
+    P = gammainc(3 / 2, hi_2 / 2)  
     return P
