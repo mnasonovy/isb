@@ -27,3 +27,21 @@ def frequency_bitwise_test(sequence: str) -> float:
     P = math.erfc(P / math.sqrt(2))
     return P
 
+def same_bits_test(sequence: str) -> float:
+    """
+    Calculate the P value for the test of same consecutive bits in a sequence.
+
+    Parameters:
+        sequence (str): Sequence of bits.
+
+    Returns:
+        float: The P value.
+    """
+    N = len(sequence)
+    sum_bits = sum(int(bit) for bit in sequence)
+    sigma = sum_bits / N
+    if not abs(sigma - 0.5) < (2 / math.sqrt(N)):
+        return 0 
+    Vn = sum(1 for i in range(len(sequence) - 1) if sequence[i] != sequence[i + 1])
+    P = math.erfc(abs(Vn - 2 * N * sigma * (1 - sigma)) / (2 * math.sqrt(2 * N) * sigma * (1 - sigma)))
+    return P
