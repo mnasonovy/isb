@@ -16,9 +16,12 @@ def read_sequence_from_file(filename: str) -> str:
     Returns:
         str: The sequence of bytes read from the file.
     """
-    with open(filename, 'r') as file:
-        sequence = file.read().strip()
-    return sequence
+    try:
+        with open(filename, 'r') as file:
+            sequence = file.read().strip()
+        return sequence
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
 
 
 def write_results_to_file(filename: str, results: dict):
@@ -29,11 +32,14 @@ def write_results_to_file(filename: str, results: dict):
         filename (str): The name of the file to write to.
         results (dict): A dictionary containing test names as keys and their corresponding results as values.
     """
-    with open(filename, 'w') as file:
-        for test, result in results.items():
-            file.write(f"{test}: {result}\n")
-            
-            
+    try:
+        with open(filename, 'w') as file:
+            for test, result in results.items():
+                file.write(f"{test}: {result}\n")
+    except IOError:
+        print(f"Error: Unable to write to file '{filename}'.")
+
+                 
 def frequency_bitwise_test(sequence: str) -> float:
     """
     Calculate the P value for the frequency bitwise test of a sequence.
