@@ -1,6 +1,7 @@
 import math
 import json
 import os
+import mpmath
 
 from typing import List  
 from scipy.special import gammainc
@@ -89,44 +90,45 @@ def longest_ones_sequence_test(sequence: str, consts_PI: List[float]) -> float:
         float: The P value.
     """
     block_length = 8
-    v = [0, 0, 0, 0]
+    v = {1: 0, 2: 0, 3: 0, 4: 0}
     hi_2 = 0
-    for block in range(0, len(sequence) // block_length):
-        max_len = 0
-        curr_len = 0
-        for i in range(block * block_length, block * block_length + block_length):
-            if sequence[i] == '1':
-                curr_len += 1
-                max_len = max(max_len, curr_len)
+    for block_start in range(0, len(sequence), block_length):
+        block = sequence[block_start:block_start + block_length]
+        max_length, length = 0, 0
+        for bit in block:
+            if bit == '1':
+                length += 1
+                max_length = max(max_length, length)
             else:
-                curr_len = 0
-        if max_len <= 1:
-            v[0] += 1
-        elif max_len == 2:
-            v[1] += 1
-        elif max_len == 3:
-            v[2] += 1
-        else:
-            v[3] += 1
-    for i in range(len(v)):
-        hi_2 += ((v[i] - 16 * consts_PI[i]) ** 2) / (16 * consts_PI[i])
-    P = gammainc(3 / 2, hi_2 / 2)  
+                length = 0
+        match max_length:
+            case 0 | 1:
+                v[1] += 1
+            case 2:
+                v[2] += 1
+            case 3:
+                v[3] += 1
+            case _:
+                v[4] += 1
+    for i in range(4):
+        hi_2 += ((v[i + 1] - 16 * consts_PI[i]) ** 2) / (16 * consts_PI[i])
+    P = mpmath.gammainc(3 / 2, hi_2 / 2)
     return P
 
 
-def run_tests_and_write_results(input_filename: str, output_filename: str, settings: dict):
+def run_tests_and_write_results(input_filename: str, output_filename: str, pi_constants: list):
     """
     Run tests on a sequence and write the results to a file.
 
     Parameters:
         input_filename (str): The name of the file containing the input sequence.
         output_filename (str): The name of the file to write the test results to.
-        settings (dict): A dictionary containing settings for the tests.
+        pi_constants (list): A list containing constants for the tests.
     """
     sequence = read_sequence_from_file(input_filename)
     frequency_result = frequency_bitwise_test(sequence)
     same_bits_result = same_bits_test(sequence)
-    longest_ones_result = longest_ones_sequence_test(sequence, settings['consts_PI'])
+    longest_ones_result = longest_ones_sequence_test(sequence, pi_constants)
 
     results = {
         "Frequency Bitwise Test": frequency_result,
@@ -137,13 +139,26 @@ def run_tests_and_write_results(input_filename: str, output_filename: str, setti
     
     
 def main():
-    with open(os.path.join('settings.json'), 'r', encoding='utf-8') as settings_file:
-        settings = json.load(settings_file)
-    input_filenames = [settings['cc_sequence_intput'], settings['java_sequence_intput']]
-    output_filenames = [settings['cc_sequence_output'], settings['java_sequence_output']]
+    try:
+        with open(os.path.join('settings.json'), 'r', encoding='utf-8') as settings_file:
+            settings = json.load(settings_file)
+            pi_constants = settings["consts_PI"]
+    except FileNotFoundError:
+        print("Error: Settings file 'settings.json' not found.")
+        return
+    except json.JSONDecodeError:
+        print("Error: Failed to decode JSON in settings file 'settings.json'.")
+        return
+
+    input_filenames = [settings.get('cc_sequence_intput'), settings.get('java_sequence_intput')]
+    output_filenames = [settings.get('cc_sequence_output'), settings.get('java_sequence_output')]
+
+    if None in input_filenames or None in output_filenames:
+        print("Error: Missing input or output file names in settings.")
+        return
 
     for input_filename, output_filename in zip(input_filenames, output_filenames):
-        run_tests_and_write_results(input_filename, output_filename, settings)
+        run_tests_and_write_results(input_filename, output_filename, pi_constants)
 
 
 if __name__ == "__main__":

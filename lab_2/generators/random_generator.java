@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.Random;
 
 public class random_generator {
+    /**
+     * Generate a random bit sequence and save it to a file.
+     * @param filename: The path to the file where the random sequence will be saved.
+     */
     public static void main(String[] args) {
         String filename = "C:\\Users\\79297\\Desktop\\isb\\lab_2\\random_sequence_java.txt";
         try {
