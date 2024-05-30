@@ -27,7 +27,7 @@ class MainWindow(QWidget):
         self.key_length = QSpinBox()
         self.key_length.setRange(32, 448)
         self.key_length.setSingleStep(8)
-        self.key_length.setValue(128)  # Default value
+        self.key_length.setValue(128)
 
         form_layout = QFormLayout()
         form_layout.addRow(self.settings_label, self.settings_path)
@@ -54,28 +54,48 @@ class MainWindow(QWidget):
         if not os.path.exists(settings_file):
             QMessageBox.critical(self, "Ошибка", f"Файл настроек {settings_file} не найден.")
             return None
-        with open(settings_file, 'r') as file:
-            settings = json.load(file)
-        settings['key_length'] = self.key_length.value()
-        return settings
+        try:
+            with open(settings_file, 'r') as file:
+                settings = json.load(file)
+            settings['key_length'] = self.key_length.value()
+            return settings
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при чтении файла настроек: {e}")
+            return None
+
+    def ensure_directory_exists(self, path):
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
     @pyqtSlot()
     def on_generate_keys(self):
         settings = self.load_settings()
         if settings:
-            generate_keys(settings)
-            QMessageBox.information(self, "Успех", "Ключи успешно сгенерированы.")
+            try:
+                key_path = settings.get('key_path')
+                self.ensure_directory_exists(key_path)
+                generate_keys(settings)
+                QMessageBox.information(self, "Успех", "Ключи успешно сгенерированы.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка", f"Ошибка при генерации ключей: {e}")
 
     @pyqtSlot()
     def on_encrypt_data(self):
         settings = self.load_settings()
         if settings:
-            encrypt_data(settings)
-            QMessageBox.information(self, "Успех", "Данные успешно зашифрованы.")
+            try:
+                encrypt_data(settings)
+                QMessageBox.information(self, "Успех", "Данные успешно зашифрованы.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка", f"Ошибка при шифровании данных: {e}")
 
     @pyqtSlot()
     def on_decrypt_data(self):
         settings = self.load_settings()
         if settings:
-            decrypt_data(settings)
-            QMessageBox.information(self, "Успех", "Данные успешно дешифрованы.")
+            try:
+                decrypt_data(settings)
+                QMessageBox.information(self, "Успех", "Данные успешно дешифрованы.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка", f"Ошибка при дешифровании данных: {e}")
