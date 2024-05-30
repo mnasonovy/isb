@@ -1,7 +1,24 @@
+from typing import Dict
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 
-def decrypt_data(settings):
+
+def decrypt_data(settings: Dict[str, str]) -> None:
+    """
+    Decrypts a file encrypted with Blowfish algorithm in CBC mode.
+
+    Args:
+        settings (Dict[str, str]): A dictionary containing the paths for the 
+                                   encrypted file, symmetric key file, and 
+                                   the output file for decrypted data.
+            - 'encrypted_file': Path to the file containing encrypted data.
+            - 'symmetric_key': Path to the file containing the symmetric key.
+            - 'decrypted_file': Path where the decrypted data will be saved.
+
+    Raises:
+        FileNotFoundError: If any of the files specified in the settings do not exist.
+        ValueError: If the decryption process encounters an error (e.g., wrong key or corrupted data).
+    """
     with open(settings['encrypted_file'], 'rb') as f:
         iv = f.read(algorithms.Blowfish.block_size // 8)
         encrypted_data = f.read()
