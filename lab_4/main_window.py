@@ -18,13 +18,15 @@ from hash_card_finder import find_card_data, luhn_algorithm
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
+        """Main window constructor."""
         super(MainWindow, self).__init__()
         self.setWindowIcon(QIcon('img/img.png'))
         self.setFixedSize(QSize(500, 300))
         self.setWindowTitle("Getting card number by hash")
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
+        """Initialize UI elements."""
         widget = QWidget()
         layout = QVBoxLayout()
 
@@ -57,11 +59,12 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def create_menu_bar(self):
+    def create_menu_bar(self) -> None:
+        """Create menu bar."""
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('File')
-        
+
         load_settings_action = QAction('Load Settings from JSON', self)
         load_settings_action.triggered.connect(self.load_json_settings)
         file_menu.addAction(load_settings_action)
@@ -71,15 +74,17 @@ class MainWindow(QMainWindow):
         file_menu.addAction(exit_action)
 
         help_menu = menubar.addMenu('Help')
-        
+
         about_action = QAction('About', self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
-    def show_about_dialog(self):
+    def show_about_dialog(self) -> None:
+        """Show About dialog."""
         QMessageBox.about(self, "About", "This is a simple application for finding card numbers by hash.")
 
     def load_json_settings(self) -> None:
+        """Load settings from JSON file."""
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Select JSON Settings File",
@@ -103,6 +108,7 @@ class MainWindow(QMainWindow):
                 )
 
     def find_number(self) -> None:
+        """Find card number by hash."""
         bins = self.btn_bins.text().replace(' ', '').split(",")
         hash_card = self.btn_hash_card.text()
         last_number = self.btn_last_number.text()
@@ -140,6 +146,7 @@ class MainWindow(QMainWindow):
                 )
 
     def luhn_algorithm(self) -> None:
+        """Check card number validity using Luhn Algorithm."""
         if not hasattr(self, 'card_number') or not self.card_number:
             QMessageBox.warning(
                 None, "Before check the card number", "Card number wasn't found or checked yet"
@@ -158,7 +165,8 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.warning(None, "Error", f"An error occurred while checking card number: {e}")
 
-    def exit_program(self):
+    def exit_program(self) -> None:
+        """Exit the program."""
         reply = QMessageBox.question(self, 'Exit program', 'Are you sure that you want to exit the program?',
                                      QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
